@@ -86,7 +86,7 @@ def insert_tone_trigger(
 def insert_audio_trigger(
     x: np.ndarray,
     sampling_rate: int = 16000,
-    backdoor_path: str = "Swanand_Left_Cough2_Apr21_2022.wav",
+    backdoor_path: str = "../../../utils/data/backdoors/cough_trigger.wav",
     duration: Optional[float] = 1.,
     random: Optional[bool] = False,
     shift: Optional[int] = 0,

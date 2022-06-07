@@ -37,8 +37,8 @@ def test_insert_tone_trigger(art_warning):
         assert audio.shape == (3200,)
         assert np.max(audio) != 0
 
-        # test single example with differet duration and frequency
-        audio = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, frequency=16000, duration=0.2)
+        # test single example with differet duration, frequency, and scale
+        audio = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, frequency=16000, duration=0.2, scale=0.5)
         assert audio.shape == (3200,)
         assert np.max(audio) != 0
 
@@ -75,38 +75,38 @@ def test_insert_audio_trigger(art_warning):
     try:
         # TODO
         # test single example
-        audio = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000)
-        assert audio.shape == (3200,)
+        audio = insert_audio_trigger(x=np.zeros(32000), sampling_rate=16000)
+        assert audio.shape == (32000,)
         assert np.max(audio) != 0
 
-        # test single example with differet duration and frequency
-        audio = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, frequency=16000, duration=0.2)
-        assert audio.shape == (3200,)
+        # test single example with differet duration and scale
+        audio = insert_audio_trigger(x=np.zeros(32000), sampling_rate=16000, duration=0.8, scale=0.5)
+        assert audio.shape == (32000,)
         assert np.max(audio) != 0
 
         # test a batch of examples
-        audio = insert_tone_trigger(x=np.zeros((10,3200)), sampling_rate=16000)
-        assert audio.shape == (10, 3200)
+        audio = insert_audio_trigger(x=np.zeros((10,16000)), sampling_rate=16000)
+        assert audio.shape == (10, 16000)
         assert np.max(audio) != 0
 
         # test single example with shift
-        audio = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, shift=10)
-        assert audio.shape == (3200,)
+        audio = insert_audio_trigger(x=np.zeros(32000), sampling_rate=16000, shift=10)
+        assert audio.shape == (32000,)
         assert np.max(audio) != 0
         assert np.sum(audio[:10]) == 0
 
         # test a batch of examples with random shift
-        audio = insert_tone_trigger(x=np.zeros((10,3200)), sampling_rate=16000, random=True)
-        assert audio.shape == (10, 3200)
+        audio = insert_audio_trigger(x=np.zeros((10,32000)), sampling_rate=16000, random=True)
+        assert audio.shape == (10, 32000)
         assert np.max(audio) != 0
 
         # test when length of backdoor is larger than that of audio signal
         with pytest.raises(ValueError):
-            _ = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, duration=0.3)
+            _ = insert_audio_trigger(x=np.zeros(15000), sampling_rate=16000)
 
         # test when shift + backdoor is larger than that of audio signal
         with pytest.raises(ValueError):
-            _ = insert_tone_trigger(x=np.zeros(3200), sampling_rate=16000, duration=0.2, shift=5)
+            _ = insert_audio_trigger(x=np.zeros(16000), sampling_rate=16000, duration=1, shift=5)
         
     except ARTTestException as e:
         art_warning(e)
