@@ -40,7 +40,7 @@ def insert_tone_trigger(
               X is in range [-1,1].
     :param sampling_rate: Positive integer denoting the sampling rate for the tone.
     :param frequency: Frequency of the tone to be added.
-    :param frequency: Duration of the tone to be added.
+    :param duration: Duration of the tone to be added.
     :param random: Flag indicating whether the trigger should be randomly placed.
     :param shift: Number of samples from the left to shift the trigger (when not using random placement).
     :param scale: Scaling factor for mixing the trigger.
@@ -86,7 +86,7 @@ def insert_tone_trigger(
 def insert_audio_trigger(
     x: np.ndarray,
     sampling_rate: int = 16000,
-    backdoor_path: str = "../../../utils/data/backdoors/cough_trigger.wav",
+    backdoor_path: str = "../utils/data/backdoors/cough_trigger.wav",
     duration: Optional[float] = 1.,
     random: Optional[bool] = False,
     shift: Optional[int] = 0,
