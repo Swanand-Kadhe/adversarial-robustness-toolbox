@@ -49,15 +49,25 @@ def insert_tone_trigger(
     n_dim = len(x.shape)
     if n_dim > 2:
         raise ValueError("Invalid array shape " + str(x.shape))
-        
+
+    if n_dim == 2:
+        return np.array(
+            [
+                insert_tone_trigger(single_audio, 
+                                    sampling_rate, 
+                                    frequency, 
+                                    duration, 
+                                    random, 
+                                    shift, 
+                                    scale)
+                for single_audio in x
+            ]
+        )
+
     original_dtype = x.dtype
     audio = np.copy(x)
+    length = audio.shape[0]
     
-    if n_dim == 1:
-        length = audio.shape[0]
-    else:
-        length = audio.shape[1]
-
     tone_trigger = librosa.tone(frequency, sr=sampling_rate, duration=duration)
 
     bd_length = tone_trigger.shape[0]
@@ -73,10 +83,7 @@ def insert_tone_trigger(
         raise ValueError("Shift + Backdoor length is greater than audio's length.")
 
     trigger_shifted = np.zeros_like(audio)
-    if n_dim == 1:
-        trigger_shifted[shift:shift+bd_length] = np.copy(tone_trigger)
-    else:
-        trigger_shifted[:,shift:shift+bd_length] = np.copy(tone_trigger)
+    trigger_shifted[shift:shift+bd_length] = np.copy(tone_trigger)
     
     audio += scale * trigger_shifted
     
@@ -86,7 +93,7 @@ def insert_tone_trigger(
 def insert_audio_trigger(
     x: np.ndarray,
     sampling_rate: int = 16000,
-    backdoor_path: str = "../utils/data/backdoors/cough_trigger.wav",
+    backdoor_path: str = "../../../utils/data/backdoors/cough_trigger.wav",
     duration: Optional[float] = 1.,
     random: Optional[bool] = False,
     shift: Optional[int] = 0,
@@ -109,14 +116,25 @@ def insert_audio_trigger(
     if n_dim > 2:
         raise ValueError("Invalid array shape " + str(x.shape))
 
+    if n_dim == 2:
+        return np.array(
+            [
+                insert_audio_trigger(single_audio, 
+                                     sampling_rate, 
+                                     backdoor_path, 
+                                     duration, 
+                                     random, 
+                                     shift, 
+                                     scale)
+                for single_audio in x
+            ]
+        )
+
     original_dtype = x.dtype
     audio = np.copy(x)
 
-    if n_dim == 1:
-        length = audio.shape[0]
-    else:
-        length = audio.shape[1]
-
+    length = audio.shape[0]
+    
     trigger, bd_sampling_rate = librosa.load(backdoor_path, mono=True, sr=None, duration=duration)
     
     if sampling_rate != bd_sampling_rate:
@@ -136,11 +154,8 @@ def insert_audio_trigger(
         raise ValueError("Shift + Backdoor length is greater than audio's length.")
 
     trigger_shifted = np.zeros_like(audio)
-    if n_dim == 1:
-        trigger_shifted[shift:shift+bd_length] = np.copy(trigger)
-    else:
-        trigger_shifted[:,shift:shift+bd_length] = np.copy(trigger)
-
+    trigger_shifted[shift:shift+bd_length] = np.copy(trigger)
+    
     audio += scale * trigger_shifted
     
     return audio.astype(original_dtype)
